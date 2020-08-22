@@ -2,7 +2,7 @@ extern crate rand;
 
 use rand::{thread_rng, Rng};
 use macroquad::*;
-use macroquad::megaui::{widgets, Vector2};
+//use macroquad::megaui::{widgets, Vector2};
 use bit_vec::BitVec;
 use std::time::{Instant};
 
@@ -17,8 +17,8 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let w = screen_width();
-    let h = screen_height();
+//    let w = screen_width();
+//    let h = screen_height();
 
     let rows: usize = 50;
     let columns: usize = 50;
@@ -28,18 +28,18 @@ async fn main() {
     let mut now = Instant::now();
 
     let mut timestep = 0.5;
-    let mut pause = false;
+    let mut pause = true;
 
     loop {
 
-        if is_key_down(KeyCode::R) {
+        if is_key_pressed(KeyCode::R) {
             initial = generator(rows*columns);
         }
-        if is_key_down(KeyCode::P) {
+        if is_key_pressed(KeyCode::P) {
             pause = !pause;
         }
-        if is_key_down(KeyCode::Space) {
-            if !pause {
+        if is_key_pressed(KeyCode::Space) {
+            if !pause {   
                 tick(rows, columns, &mut initial);
             }
         }
@@ -94,15 +94,16 @@ fn gui(mut timestep: &mut f32) {
     draw_window(
             hash!(),
             Vec2::new(490., 20.),
-            Vec2::new(200., 200.),
+//            Vec2::new(200., 200.),
+            Vec2::new(400., 200.),
             None,
             |ui| {
-                let (mouse_x, mouse_y) = mouse_position();
-                ui.label(None, &format!("Mouse position: {} {}", mouse_x, mouse_y));
+                let (x, y) = mouse_position();
+                ui.label(None, &format!("Mouse position: {} {}", x, y));
 
                 ui.label(None, &format!("FPS: {}", get_fps()));
 
-                ui.slider(hash!(), "5", 0f32..5f32, &mut timestep);
+                ui.slider(hash!(), "", 0f32..5f32, &mut timestep);
 
             },
         );
@@ -150,20 +151,20 @@ fn generator(total: usize) -> BitVec {
     let mut bv = BitVec::from_elem(total, false);
 
     // uncomment for glider 
-    bv.set(2, true);
+    /*bv.set(2, true);
     bv.set(50, true);
     bv.set(52, true);
     bv.set(101, true);
-    bv.set(102, true);
+    bv.set(102, true);*/
 
     // uncomment for 50% chance of spawns
-    /*
+    
     let mut rng = thread_rng();
     for i in 0..bv.len() {
         if rng.gen_bool(1.0 / 2.0) {
             bv.set(i, true);
         }
-    }*/
+    }
 
     bv
 }
