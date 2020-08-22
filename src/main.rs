@@ -2,9 +2,20 @@ extern crate rand;
 
 use rand::{thread_rng, Rng};
 use macroquad::*;
+use macroquad::megaui::{widgets, Vector2};
 use bit_vec::BitVec;
+use std::time::{Instant};
 
-#[macroquad::main("Life")]
+fn window_conf() -> Conf {
+    Conf {
+        window_title: "conways game of life".to_owned(),
+        window_width: 710,
+        window_height: 500,
+        ..Default::default()
+    }
+}
+
+#[macroquad::main(window_conf)]
 async fn main() {
     let w = screen_width();
     let h = screen_height();
@@ -14,17 +25,34 @@ async fn main() {
     
     let mut initial = generator(rows*columns);
 
+    let mut now = Instant::now();
+
+    let mut timestep = 0.5;
+    let mut pause = false;
+
     loop {
 
-        if is_key_down(KeyCode::Space) {
+        if is_key_down(KeyCode::R) {
             initial = generator(rows*columns);
+        }
+        if is_key_down(KeyCode::P) {
+            pause = !pause;
+        }
+        if is_key_down(KeyCode::Space) {
+            if !pause {
+                tick(rows, columns, &mut initial);
+            }
         }
 
         clear_background(BLACK);
 
-        tick(rows, columns, &mut initial);
-
+        if now.elapsed().as_secs_f32() >= timestep && pause {
+            tick(rows, columns, &mut initial);
+            now = Instant::now();
+        }
         draw(rows, columns, &initial);
+
+        gui(&mut timestep);
 
         next_frame().await
     }
@@ -62,15 +90,34 @@ fn tick(rows: usize, columns: usize, initial: &mut BitVec) {
 
 }
 
+fn gui(mut timestep: &mut f32) {
+    draw_window(
+            hash!(),
+            Vec2::new(490., 20.),
+            Vec2::new(200., 200.),
+            None,
+            |ui| {
+                let (mouse_x, mouse_y) = mouse_position();
+                ui.label(None, &format!("Mouse position: {} {}", mouse_x, mouse_y));
+
+                ui.label(None, &format!("FPS: {}", get_fps()));
+
+                ui.slider(hash!(), "5", 0f32..5f32, &mut timestep);
+
+            },
+        );
+}
+
 fn draw(rows: usize, columns: usize, initial: &BitVec) {
+    let s = 20.0;
 
     for r in 0..rows {
         for c in 0..columns {
             let idx = get_index(r, c);
             if initial.get(idx).unwrap() {
-                draw_rectangle((c * (8 + 1)) as f32, (r * (8 + 1)) as f32, 8.0, 8.0, GREEN)
+                draw_rectangle((c * (8 + 1)) as f32 + s, (r * (8 + 1)) as f32 + s, 8.0, 8.0, GREEN)
             } else {
-                draw_rectangle((c * (8 + 1)) as f32, (r * (8 + 1)) as f32, 8.0, 8.0, WHITE)
+                draw_rectangle((c * (8 + 1)) as f32 + s, (r * (8 + 1)) as f32 + s, 8.0, 8.0, WHITE)
             }
         }
     }
@@ -101,21 +148,22 @@ fn get_index(row: usize, col: usize) -> usize {
 
 fn generator(total: usize) -> BitVec {
     let mut bv = BitVec::from_elem(total, false);
-    let mut rng = thread_rng();
 
     // uncomment for glider 
-/*  bv.set(2, true);
+    bv.set(2, true);
     bv.set(50, true);
     bv.set(52, true);
     bv.set(101, true);
-    bv.set(102, true);*/
+    bv.set(102, true);
 
     // uncomment for 50% chance of spawns
+    /*
+    let mut rng = thread_rng();
     for i in 0..bv.len() {
         if rng.gen_bool(1.0 / 2.0) {
             bv.set(i, true);
         }
-    }
+    }*/
 
     bv
 }

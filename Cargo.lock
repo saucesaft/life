@@ -127,8 +127,7 @@ dependencies = [
 [[package]]
 name = "macroquad"
 version = "0.2.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1bed455f10985214c433d52dc7155547ab6f867a370abcbc159aae4be1b37200"
+source = "git+https://github.com/not-fl3/macroquad#4ebff32642b54ee6754fbefdeb95ee050b4a3a7a"
 dependencies = [
  "glam",
  "image",
@@ -141,15 +140,14 @@ dependencies = [
 
 [[package]]
 name = "macroquad_macro"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "130d84f4402225e7e343256f519ff47f3cd439031fa76ef79d92f2f4c6389223"
+version = "0.1.0"
+source = "git+https://github.com/not-fl3/macroquad#4ebff32642b54ee6754fbefdeb95ee050b4a3a7a"
 
 [[package]]
 name = "megaui"
-version = "0.2.11"
+version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42308f599c4d01137587fdd259480ea558159383ce5dfabcabfffabc779173a0"
+checksum = "3470b1af54c78a5f11dd20e977af497f3cc177462c3c5b08c64d1df2b76aafe4"
 dependencies = [
  "miniquad_text_rusttype",
 ]
