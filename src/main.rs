@@ -27,10 +27,13 @@ async fn main() {
 
     let mut now = Instant::now();
 
-    let mut timestep = 0.5;
+    let mut timestep = 0.4;
     let mut pause = true;
+    let mut flipflop = true;
 
     loop {
+
+        clear_background(BLACK);
 
         if is_key_pressed(KeyCode::R) {
             initial = generator(rows*columns);
@@ -43,14 +46,17 @@ async fn main() {
                 tick(rows, columns, &mut initial);
             }
         }
-
-        clear_background(BLACK);
+        if is_key_pressed(KeyCode::C) {
+            initial.clear();
+        }       
 
         if now.elapsed().as_secs_f32() >= timestep && pause {
             tick(rows, columns, &mut initial);
             now = Instant::now();
         }
         draw(rows, columns, &initial);
+
+        post(rows, columns, &mut initial, &mut flipflop);
 
         gui(&mut timestep);
 
@@ -59,7 +65,7 @@ async fn main() {
 }
 
 fn tick(rows: usize, columns: usize, initial: &mut BitVec) {
-    let mut next = initial.clone();    
+    let mut next = initial.clone();
 
     for r in 0..rows {
         for c in 0..columns {
@@ -87,6 +93,31 @@ fn tick(rows: usize, columns: usize, initial: &mut BitVec) {
     }
     
     *initial = next;
+
+}
+
+fn post(rows: usize, columns: usize, cells: &mut BitVec, f: &mut bool) {
+    if is_key_pressed(KeyCode::A) {
+//    if *f && is_mouse_button_down(MouseButton::Left) {
+        let (xo, yo) : (f32, f32) = (20.0, 20.0);
+        let size: f32 = 8.0;
+        let (x, y) = mouse_position();
+
+        let idx = get_index(
+            ((y-yo)/(size + 1.0)).round() as usize,
+            ((x-xo)/(size + 1.0)).round() as usize
+        );
+
+        cells.set(idx, !cells.get(idx).unwrap());
+
+        *f = true;
+
+    }
+
+/*    if !*f && !is_mouse_button_down(MouseButton::Left) {
+        *f = false;
+    }*/
+
 
 }
 
