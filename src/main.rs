@@ -29,7 +29,6 @@ async fn main() {
 
     let mut timestep = 0.4;
     let mut pause = true;
-    let mut flipflop = true;
 
     loop {
 
@@ -56,7 +55,7 @@ async fn main() {
         }
         draw(rows, columns, &initial);
 
-        post(rows, columns, &mut initial, &mut flipflop);
+        post(&mut initial);
 
         gui(&mut timestep);
 
@@ -96,9 +95,8 @@ fn tick(rows: usize, columns: usize, initial: &mut BitVec) {
 
 }
 
-fn post(rows: usize, columns: usize, cells: &mut BitVec, f: &mut bool) {
-    if is_key_pressed(KeyCode::A) {
-//    if *f && is_mouse_button_down(MouseButton::Left) {
+fn post(cells: &mut BitVec) {
+    if is_mouse_button_down(MouseButton::Left) {
         let (xo, yo) : (f32, f32) = (20.0, 20.0);
         let size: f32 = 8.0;
         let (x, y) = mouse_position();
@@ -108,16 +106,22 @@ fn post(rows: usize, columns: usize, cells: &mut BitVec, f: &mut bool) {
             ((x-xo)/(size + 1.0)).round() as usize
         );
 
-        cells.set(idx, !cells.get(idx).unwrap());
-
-        *f = true;
-
+        cells.set(idx, true);
     }
 
-/*    if !*f && !is_mouse_button_down(MouseButton::Left) {
-        *f = false;
-    }*/
+    if is_mouse_button_down(MouseButton::Right) {
+        let (xo, yo) : (f32, f32) = (20.0, 20.0);
+        let size: f32 = 8.0;
+        let (x, y) = mouse_position();
 
+        let idx = get_index(
+            ((y-yo)/(size + 1.0)).round() as usize,
+            ((x-xo)/(size + 1.0)).round() as usize
+        );
+
+        cells.set(idx, false);
+    }
+    
 
 }
 
@@ -125,7 +129,6 @@ fn gui(mut timestep: &mut f32) {
     draw_window(
             hash!(),
             Vec2::new(490., 20.),
-//            Vec2::new(200., 200.),
             Vec2::new(400., 200.),
             None,
             |ui| {
